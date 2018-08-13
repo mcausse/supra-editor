@@ -15,7 +15,7 @@
 
 		<delete includeemptydirs="true">
 			<fileset dir="${release-dir}" defaultexcludes="false">
-				<include name="**/*" />
+				<include name="*.jar" />
 			</fileset>
 		</delete>
 

@@ -2,6 +2,8 @@ package org.homs.supraedit;
 
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -328,6 +330,27 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                 textArea.replaceRange(s.toUpperCase(), textArea.getSelectionStart(), textArea.getSelectionEnd());
             }
             textArea.requestFocus();
+
+        } else if (cmd.startsWith("!")) {
+            String command = cmd.substring(1);
+            try {
+                Process p = Runtime.getRuntime().exec(command);
+                p.waitFor();
+
+                StringBuilder sb = new StringBuilder();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line + "\n");
+                }
+
+                textArea.insert(sb.toString(), textArea.getCaretPosition());
+                textArea.requestFocus();
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e)));
+                throw new RuntimeException(e);
+            }
         } else {
             throw new RuntimeException("illegal command: " + cmd);
         }
