@@ -6,10 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
+
+import org.homs.supraedit.util.ExceptionUtils;
 
 public class MyKeyEventDispatcher implements KeyEventDispatcher {
 
@@ -19,15 +20,19 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
     final Closure onDoRecord;
     final Closure onDoPlay;
     final Closure onCloseCurrTab;
+    final Closure onTabToLeft;
+    final Closure onTabToRight;
 
     public MyKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onDoRecord,
-            Closure onDoPlay, Closure onCloseCurrTab) {
+            Closure onDoPlay, Closure onCloseCurrTab, Closure onTabToLeft, Closure onTabToRight) {
         super();
         this.macroRecording = macroRecording;
         this.cmdTextField = cmdTextField;
         this.onDoRecord = onDoRecord;
         this.onDoPlay = onDoPlay;
         this.onCloseCurrTab = onCloseCurrTab;
+        this.onTabToLeft = onTabToLeft;
+        this.onTabToRight = onTabToRight;
     }
 
     boolean controlPressed = false;
@@ -102,27 +107,15 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                     this.shiftPressed = true;
                     break;
                 case KeyEvent.VK_LEFT: {
-
                     if (altPressed) {
-                        // TODO fer per Closure
-                        JTabbedPane tabs = (JTabbedPane) cmdTextField.getParent().getParent().getParent();
-                        int selected = tabs.getSelectedIndex();
-                        if (selected > 0) {
-                            tabs.setSelectedIndex(selected - 1);
-                        }
+                        onTabToLeft.execute();
                         e.consume();
                     }
                     break;
                 }
                 case KeyEvent.VK_RIGHT: {
-
                     if (altPressed) {
-                        // TODO fer per Closure
-                        JTabbedPane tabs = (JTabbedPane) cmdTextField.getParent().getParent().getParent();
-                        int selected = tabs.getSelectedIndex();
-                        if (selected < tabs.getTabCount() - 1) {
-                            tabs.setSelectedIndex(selected + 1);
-                        }
+                        onTabToRight.execute();
                         e.consume();
                     }
                     break;

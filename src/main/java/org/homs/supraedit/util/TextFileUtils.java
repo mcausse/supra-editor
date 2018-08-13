@@ -1,4 +1,4 @@
-package org.homs.supraedit;
+package org.homs.supraedit.util;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

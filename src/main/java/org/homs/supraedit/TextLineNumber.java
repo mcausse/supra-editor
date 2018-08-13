@@ -278,7 +278,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
                 int x = getOffsetX(availableWidth, stringWidth) + insets.left;
                 int y = getOffsetY(rowStartOffset, fontMetrics);
 
-                // TODO sombra del # de fila actual
+                // XXX sombra del # de fila actual
                 if (isCurrentLine(rowStartOffset)) {
                     g.setColor(Color.RED);
                     g.fillRect(x, y - fontMetrics.getHeight() + fontMetrics.getHeight() / 4, stringWidth,

@@ -1,4 +1,4 @@
-package org.homs.supraedit;
+package org.homs.supraedit.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
