@@ -225,7 +225,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
     private void setPreferredWidth() {
         Element root = component.getDocument().getDefaultRootElement();
         int lines = root.getElementCount();
-        int digits = Math.max(String.valueOf(lines).length(), minimumDisplayDigits);
+        int digits = Math.max(String.valueOf(lines + 2).length(), minimumDisplayDigits);
 
         // Update sizes when number of digits in the line number changes
 
@@ -322,7 +322,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         Element line = root.getElement(index);
 
         if (line.getStartOffset() == rowStartOffset) {
-            return String.valueOf(index + 1);
+            return " " + String.valueOf(index + 1) + " ";
         } else {
             return "";
         }

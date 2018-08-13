@@ -4,16 +4,19 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -50,32 +53,43 @@ import javax.swing.UnsupportedLookAndFeelException;
  *
  * <h2>Navegació bàsica</h2>
  *
- * <p>
+ * <pre>
  * Els fitxers en edició s'organitzen en tabs: [Alt+left] i [Alt+right] canvia
  * de tab actiu.
  *
- * <p>
  * En cada tab hi ha l'àrea d'edició, i un input text: el cursor conmuta entre
  * aquests amb [Esc].
  *
- * [Control+R] engega/atura la grabació de macro, [Control+P] la playa.
+ * [Control+R] engega/atura la grabació de macro,
+ * [Control+P] la playa.
  *
- * [Control+Z] undo, [Control+Y] redo.
+ * [Control+Z] undo
+ * [Control+Y] redo.
+ * [Control+T] nou tab
+ * [Control+O] open file
+ * [Control+S] save file
+ * [Control+W] tanca tab
+ * [Control+Q] quit
  *
- * [F10] obre el menú via teclat.
  *
  * La resta són les combinacions de teclat usuals.
  *
+ * </pre>
+ *
  *
  * <h2>comandos per línia</h2>
+ *
+ * <pre>
  *
  * f[text] - cerca endavant segons text (case sensitive)
  *
  * F[text] - cerca enrera segons text (case sensitive)
  *
- * @f[regexp] - cerca endavant per una regexp
+ * &#64;f[regexp] - cerca endavant per una regexp
  *
  * #[numfila] - go to # fila
+ *
+ * </pre>
  *
  */
 public class SupraEditor extends JFrame {
@@ -104,27 +118,44 @@ public class SupraEditor extends JFrame {
     final JMenuItem openItem = new JMenuItem("Open");
     final JMenuItem saveItem = new JMenuItem("Save");
     final JMenuItem saveAsItem = new JMenuItem("Save As");
+    final JMenuItem closeTabItem = new JMenuItem("Close Tab");
     final JMenuItem exitItem = new JMenuItem("Exit");
 
     // Constructor: create a text editor with a menu
     public SupraEditor() {
         super("Supra Ed");
 
+        {
+            java.net.URL imgURL = getClass().getClassLoader().getResource("idcon.png");
+            ImageIcon icon = new ImageIcon(imgURL);
+            setIconImage(icon.getImage());
+        }
+
+        /**
+         * Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask() returns control key
+         * (ctrl) on Windows and linux, and command key (⌘) on Mac OS.
+         */
+        newItem.setAccelerator(KeyStroke.getKeyStroke('T', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        openItem.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        saveItem.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        closeTabItem.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        exitItem.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+
         fileMenu.add(newItem);
         fileMenu.add(openItem);
         fileMenu.add(saveItem);
         fileMenu.add(saveAsItem);
+        fileMenu.add(closeTabItem);
         fileMenu.add(exitItem);
         menuBar.add(fileMenu);
         add(menuBar, BorderLayout.NORTH);
 
         // https://docs.oracle.com/javase/tutorial/uiswing/components/tabbedpane.html
         JTabbedPane tabbedPane = new JTabbedPane();
-        // ImageIcon icon = createImageIcon("images/middle.gif");
         add(tabbedPane);
 
         EditorPane p1 = new EditorPane();
-        tabbedPane.addTab("?", null, p1, "???");
+        tabbedPane.addTab("  ?  ", null, p1, "???");
         tabbedPane.setSelectedComponent(p1);
 
         int tabSelected = tabbedPane.getSelectedIndex();
@@ -147,7 +178,7 @@ public class SupraEditor extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == newItem) {
                     EditorPane p = new EditorPane();
-                    tabbedPane.addTab("?", null, p, "???");
+                    tabbedPane.addTab("  ?  ", null, p, "???");
                     tabbedPane.setSelectedComponent(p);
                     p.requestFocus();
                 } else if (e.getSource() == openItem) {
@@ -160,6 +191,13 @@ public class SupraEditor extends JFrame {
                     getCurrEditorPane().saveFile(false);
                 } else if (e.getSource() == saveAsItem) {
                     getCurrEditorPane().saveFile(true);
+                } else if (e.getSource() == closeTabItem) {
+                    if (tabbedPane.getTabCount() - 1 <= 0) {
+                        return;
+                    }
+                    tabbedPane.remove(tabbedPane.getSelectedIndex());
+                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+                    tabbedPane.getComponent(tabbedPane.getTabCount() - 1).requestFocus();
                 } else if (e.getSource() == exitItem) {
                     System.exit(0);
                 }
@@ -170,6 +208,7 @@ public class SupraEditor extends JFrame {
         openItem.addActionListener(actionListener);
         saveItem.addActionListener(actionListener);
         saveAsItem.addActionListener(actionListener);
+        closeTabItem.addActionListener(actionListener);
         exitItem.addActionListener(actionListener);
 
         /**

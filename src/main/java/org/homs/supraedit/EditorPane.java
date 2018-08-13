@@ -192,16 +192,6 @@ public class EditorPane extends JPanel {
         Closure onDoPlay = () -> {
             playMacroButton.doClick();
         };
-        Closure onCloseCurrTab = () -> {
-            JTabbedPane tabs = (JTabbedPane) getParent();
-            if (tabs.getTabCount() - 1 <= 0) {
-                return;
-            }
-            int selectedIndex = tabs.getSelectedIndex();
-            tabs.remove(selectedIndex);
-            tabs.setSelectedIndex(tabs.getTabCount() - 1);
-            tabs.getComponent(tabs.getTabCount() - 1).requestFocus();
-        };
         Closure onTabToLeft = () -> {
             JTabbedPane tabs = (JTabbedPane) getParent();
             int selected = tabs.getSelectedIndex();
@@ -222,7 +212,7 @@ public class EditorPane extends JPanel {
         };
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MyKeyEventDispatcher(
-                macroRecording, cmdTextField, onDoRecord, onDoPlay, onCloseCurrTab, onTabToLeft, onTabToRight));
+                macroRecording, cmdTextField, onDoRecord, onDoPlay, onTabToLeft, onTabToRight));
 
         textArea.requestFocus();
 

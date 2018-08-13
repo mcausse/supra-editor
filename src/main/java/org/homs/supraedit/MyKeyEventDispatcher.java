@@ -19,18 +19,16 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
 
     final Closure onDoRecord;
     final Closure onDoPlay;
-    final Closure onCloseCurrTab;
     final Closure onTabToLeft;
     final Closure onTabToRight;
 
     public MyKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onDoRecord,
-            Closure onDoPlay, Closure onCloseCurrTab, Closure onTabToLeft, Closure onTabToRight) {
+            Closure onDoPlay, Closure onTabToLeft, Closure onTabToRight) {
         super();
         this.macroRecording = macroRecording;
         this.cmdTextField = cmdTextField;
         this.onDoRecord = onDoRecord;
         this.onDoPlay = onDoPlay;
-        this.onCloseCurrTab = onCloseCurrTab;
         this.onTabToLeft = onTabToLeft;
         this.onTabToRight = onTabToRight;
     }
@@ -138,14 +136,6 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                     }
                     break;
                 }
-                case KeyEvent.VK_W: {
-                    if (controlPressed) {
-                        onCloseCurrTab.execute();
-                        e.consume();
-                    }
-                    break;
-                }
-
                 case KeyEvent.VK_TAB: {
                     if (macroRecording.getTextArea().getSelectedText() != null) {
 
