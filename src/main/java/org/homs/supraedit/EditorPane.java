@@ -260,6 +260,7 @@ public class EditorPane extends JPanel {
 
         String charsetName = encodingStrings[encodingCombo.getSelectedIndex()];
         loadFile(name, charsetName);
+        textArea.setCaretPosition(0);
     }
 
     private void loadFile(String name, String charsetName) {

@@ -315,6 +315,19 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                 JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e)));
                 throw new RuntimeException(e);
             }
+
+        } else if (cmd.startsWith("u")) {
+            String s = textArea.getSelectedText();
+            if (s != null && !s.isEmpty()) {
+                textArea.replaceRange(s.toLowerCase(), textArea.getSelectionStart(), textArea.getSelectionEnd());
+            }
+            textArea.requestFocus();
+        } else if (cmd.startsWith("U")) {
+            String s = textArea.getSelectedText();
+            if (s != null && !s.isEmpty()) {
+                textArea.replaceRange(s.toUpperCase(), textArea.getSelectionStart(), textArea.getSelectionEnd());
+            }
+            textArea.requestFocus();
         } else {
             throw new RuntimeException("illegal command: " + cmd);
         }

@@ -1,0 +1,55 @@
+<!DOCTYPE project>
+
+<project name="build-all" basedir="." default="compiladeploya">
+
+	<property name="release-dir" value="./dist" />
+
+	<!--
+	<property name="mvn2-executable-path" location="C:\java\mavens\apache-maven-3.0.4\bin\mvn.bat" />
+	<property name="JAVA_HOME" location="C:\Program Files\Java\jdk1.6.0_45" />
+	-->
+	<property name="mvn2-executable-path" location="/home/mhoms/java/apache-maven-3.2.3/bin/mvn" />
+	<property name="JAVA_HOME" location="/home/mhoms/java/jdk1.8.0_112" />
+
+	<target name="compiladeploya">
+
+		<delete includeemptydirs="true">
+			<fileset dir="${release-dir}" defaultexcludes="false">
+				<include name="**/*" />
+			</fileset>
+		</delete>
+
+		<exec dir="." executable="${mvn2-executable-path}">
+			<env key="JAVA_HOME" value="${JAVA_HOME}" />
+			<arg value="clean" />
+			<arg value="install" />
+		</exec>
+		
+		<copy todir="${release-dir}" >  
+		    <fileset dir="./target" includes="*.jar"/>  
+		</copy> 
+
+
+<!--
+		<copy file="src/test/resources/http-config.properties" tofile="${release-dir}/cfg/http-server-config.properties"/>
+		<copy file="src/test/resources/https-config.properties" tofile="${release-dir}/cfg/https-server-config.properties"/>
+		<copy file="src/test/resources/log4j.properties" tofile="${release-dir}/cfg/log4j.properties"/>
+		<copy file="src/test/resources/testkey.jks" tofile="${release-dir}/cfg/testkey.jks"/>
+-->
+		<!--
+		<exec dir="${release-dir}" executable="${JAVA_HOME}/bin/java">
+			<arg value="-Xdebug" />
+			<arg value="-Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=n" />
+			<arg value="-cp" />
+			<arg value="cfg:bin/*" />
+			<arg value="org.srxboss.Server" />
+			<arg value="localhost" />
+			<arg value="8000" />
+		</exec>
+-->
+
+
+
+	</target>
+
+</project>

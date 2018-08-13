@@ -88,6 +88,9 @@ import javax.swing.UnsupportedLookAndFeelException;
  * &#64;f[regexp] - cerca endavant per una regexp
  *
  * #[numfila] - go to # fila
+ * 
+ * u - converteix la sel.lecció a toLowerCase()
+ * U - converteix la sel.lecció a toUpperCase()
  *
  * </pre>
  *
