@@ -19,20 +19,14 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
     final MacroRecording macroRecording;
     final JTextField cmdTextField;
 
-    final Closure onDoRecord;
-    final Closure onDoPlay;
-    final Closure onDoPlayEof;
     final Closure onTabToLeft;
     final Closure onTabToRight;
 
-    public SupraKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onDoRecord,
-            Closure onDoPlay, Closure onDoPlayEof, Closure onTabToLeft, Closure onTabToRight) {
+    public SupraKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onTabToLeft,
+            Closure onTabToRight) {
         super();
         this.macroRecording = macroRecording;
         this.cmdTextField = cmdTextField;
-        this.onDoRecord = onDoRecord;
-        this.onDoPlay = onDoPlay;
-        this.onDoPlayEof = onDoPlayEof;
         this.onTabToLeft = onTabToLeft;
         this.onTabToRight = onTabToRight;
     }
@@ -124,30 +118,8 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 }
                 case KeyEvent.VK_ESCAPE: {
                     cmdTextField.requestFocus();
-                    break;
-                }
-                /**
-                 * CONSUMEIX EL [CONTROL+R] PQ NO EL POT GRAVAR!
-                 */
-                case KeyEvent.VK_R: {
-                    if (controlPressed) {
-                        onDoRecord.execute();
-                        e.consume();
-                    }
-                    break;
-                }
-                case KeyEvent.VK_P: {
-                    if (controlPressed) {
-                        onDoPlay.execute();
-                        e.consume();
-                    }
-                    break;
-                }
-                case KeyEvent.VK_E: {
-                    if (controlPressed) {
-                        onDoPlayEof.execute();
-                        e.consume();
-                    }
+                    cmdTextField.setSelectionStart(0);
+                    cmdTextField.setSelectionEnd(cmdTextField.getText().length());
                     break;
                 }
 
@@ -176,8 +148,8 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
                             String selection = macroRecording.getTextArea().getSelectedText();
 
-                            selection = selection.replaceAll("^\\t", "");
-                            selection = selection.replaceAll("\\n\\t", "\n");
+                            selection = selection.replaceAll("^\\s+", "");
+                            selection = selection.replaceAll("\\n\\s+", "\n");
 
                             macroRecording.getTextArea().replaceSelection(selection);
 
@@ -269,7 +241,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
         if (cmd.startsWith("f")) {
             String cmdVal = cmd.substring(1);
-            int textLength = macroRecording.getTextArea().getDocument().getLength();
+            int textLength = textArea.getDocument().getLength();
 
             int findPos = textArea.getCaretPosition() + 1;
             if (findPos >= textLength) {

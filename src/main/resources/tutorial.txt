@@ -1,0 +1,29 @@
+
+[Esc] edit/command mode
+
+Edit mode:
+
+   [Alt+left]/[Alt+right] tabs
+   [Control+R] engega/atura la grabació de macro,
+   [Control+P] la playa,
+   [Control+E] la playa repetint fins arribar a EOF (oju als bucles infinits),
+   [Control+T] nou tab
+   [Control+O] open file
+   [Control+S] save file
+   [Control+W] tanca tab
+   [Control+Q] quit
+   [Control+Z] undo
+   [Control+Y] redo
+   [Control+X] cut
+   [Control+C], [Control+Insert] copy
+   [Control+P], [Shift+Insert] paste
+
+ Command mode:
+
+   f[text]      - cerca endavant (case sensitive)
+   F[text]      - cerca enrera (case sensitive)
+   @f[regexp]   - cerca endavant per regexp
+   #[numfila]   - go to # fila
+   u            - sel.lecció.toLowerCase()
+   U            - sel.lecció.toUpperCase()
+   !cal         - inserta la sortida d'un comando de línia

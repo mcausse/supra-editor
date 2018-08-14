@@ -21,60 +21,19 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-//[Esc] edit/command mode
-//[Alt+left]/[Alt+right] tabs
-//[Control+R] engega/atura la grabació de macro,
-//[Control+P] la playa,
-//[Control+E] la playa repetint fins arribar a EOF (oju als bucles infinits),
-//[Control+Z] undo
-//[Control+Y] redo.
-//[Control+T] nou tab
-//[Control+O] open file
-//[Control+S] save file
-//[Control+W] tanca tab
-//[Control+Q] quit
-//[Control+Z] undo
-//[Control+Y] redo
-//
-// TODO documentar el copy/paste
-//
-//f[text]  - cerca endavant (case sensitive)
-//F[text]  - cerca enrera (case sensitive)
-//@f[regexp]   - cerca endavant per regexp
-//#[numfila]   - go to # fila
-//u        - sel.lecció.toLowerCase()
-//U        - sel.lecció.toUpperCase()
-//!cal         - inserta la sortida d'un comando de línia
-
-//TODO Control+Up/Down (scroll) https://stackoverflow.com/questions/33862270/java-scrollpane-with-a-textarea-inside-can-not-scroll-to-top-programmatically
-// FIXME problema gordo: i com guardar les macros? els event que es graven
-// referencien als components JTextArea, no ho podem serialitzar tot!
-// TODO guardar macros a fitxer
-
+// TODO Control+Up/Down (scroll) https://stackoverflow.com/questions/33862270/java-scrollpane-with-a-textarea-inside-can-not-scroll-to-top-programmatically
 // TODO fer un Thread amb timer (Watchdog) que limiti el temps en fer [Control+E] i així trencar els bucles infinits de macro?
+// TODO !cal funciona en Linux, falla en Win (!date, !dir, ... hauria de ser un comando de fitxer de veritat...)
+
+// XXX en fer [Esc] i passar a command mode, focusar l'input text amb tot el valor sel.leccionat
+// (i donar color i estil com a la sel.lecció de text).
+// XXX problema gordo: i com guardar les macros? els event que es graven
+// referencien als components JTextArea, no ho podem serialitzar tot! (veure KeyEventSerializer !!!!!)
+// XXX guardar macros a fitxer
 // XXX repetició de macro fins EOF
-// TODO !cal funciona en Linux, falla en Win (!date)
 // XXX autoindent: en enter, segueix la tabulació de l'anterior fila.
-// TODO fer hotkey per botons Rec/PLay macro, i treure del MyKeyEventListener la
+// XXX fer hotkey per botons Rec/PLay macro, i treure del MyKeyEventListener la
 // gestió d'aquestes tecles (que no són recordables).
-// create an Action doing what you want
-// Action action = new AbstractAction("doSomething") {
-//
-// @Override
-// public void actionPerformed(ActionEvent e) {
-// System.out.println("triggered the action");
-// }
-//
-// };
-//// configure the Action with the accelerator (aka: short cut)
-// action.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
-//
-//// create a button, configured with the Action
-// JButton toolBarButton = new JButton(action);
-//// manually register the accelerator in the button's component input map
-// toolBarButton.getActionMap().put("myAction", action);
-// toolBarButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-// (KeyStroke) action.getValue(Action.ACCELERATOR_KEY), "myAction");
 
 public class SupraEditor extends JFrame {
 
@@ -83,14 +42,9 @@ public class SupraEditor extends JFrame {
     public static void main(String args[]) throws ClassNotFoundException, InstantiationException,
             IllegalAccessException, UnsupportedLookAndFeelException {
 
+        // TODO l&f
         // JFrame.setDefaultLookAndFeelDecorated(true);
-
-        // TODO
         // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-
-        // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-        // SwingUtilities.updateComponentTreeUI(this);
-        // this.pack();
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -121,6 +75,8 @@ public class SupraEditor extends JFrame {
         /**
          * Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask() returns control key
          * (ctrl) on Windows and linux, and command key (⌘) on Mac OS.
+         *
+         * TODO forçar que sigui amb el Control
          */
         newItem.setAccelerator(KeyStroke.getKeyStroke('T', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         openItem.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -144,7 +100,6 @@ public class SupraEditor extends JFrame {
         EditorPane p1 = new EditorPane();
         tabbedPane.addTab("  ?  ", null, p1, "???");
         tabbedPane.setSelectedComponent(p1);
-
         int tabSelected = tabbedPane.getSelectedIndex();
         ((EditorPane) tabbedPane.getComponent(tabSelected)).textArea.requestFocus();
 
