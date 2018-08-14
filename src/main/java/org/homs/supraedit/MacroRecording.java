@@ -38,7 +38,6 @@ public class MacroRecording {
     public void record(KeyEvent ke) {
         if (isRecording) {
             this.eventsRecorded.add(ke);
-             System.out.println("recording: " + ke);
         }
     }
 

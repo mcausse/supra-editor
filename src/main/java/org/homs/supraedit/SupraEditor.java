@@ -21,82 +21,61 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/**
- * moviment de cursor complet, amb selecció. Accés a clipboard de sistema.
- * Eliminació en ambdós sentits Inserció de tota classe de caràcters regionals
- * (accents, etc)
- *
- * // XXX MACROS: el recording de macros registra tot lo de textarea i del
- * cmdInputText! Ho reprodeueix tot dins la mateixa pestanya!
- *
- * // XXX selecció per mouse
- *
- * // XXX undo
- *
- * // XXX pestanyes
- *
- * // XXX find text/regexp in/sensitive wrap forward/backward
- *
- * // XXX replace (amb grouping si regexp=true): no cal, tenim macros!
- *
- * // XXX comandos inline (per input)
- *
- * // XXX (des)tabulació en bloc
- *
- * // TODO autoindent: en enter, segueix la tabulació de l'anterior fila.
- *
- * // XXX tractar possibles encodings
- *
- *
- * <h1>Supra Ed <small>the ultimate editor for text editing
- * enthusiasts</small></h1>
- *
- * <h2>Navegació bàsica</h2>
- *
- * <pre>
- * Els fitxers en edició s'organitzen en tabs: [Alt+left] i [Alt+right] canvia
- * de tab actiu.
- *
- * En cada tab hi ha l'àrea d'edició, i un input text: el cursor conmuta entre
- * aquests amb [Esc].
- *
- * [Control+R] engega/atura la grabació de macro,
- * [Control+P] la playa.
- *
- * [Control+Z] undo
- * [Control+Y] redo.
- * [Control+T] nou tab
- * [Control+O] open file
- * [Control+S] save file
- * [Control+W] tanca tab
- * [Control+Q] quit
- *
- *
- * La resta són les combinacions de teclat usuals.
- *
- * </pre>
- *
- *
- * <h2>comandos per línia</h2>
- *
- * <pre>
- *
- * f[text] - cerca endavant segons text (case sensitive)
- *
- * F[text] - cerca enrera segons text (case sensitive)
- *
- * &#64;f[regexp] - cerca endavant per una regexp
- *
- * #[numfila] - go to # fila
- *
- * u - converteix la sel.lecció a toLowerCase()
- * U - converteix la sel.lecció a toUpperCase()
- *
- * !cal - inserta la sortida d'un comando de línia
- *
- * </pre>
- *
- */
+//[Esc] edit/command mode
+//[Alt+left]/[Alt+right] tabs
+//[Control+R] engega/atura la grabació de macro,
+//[Control+P] la playa,
+//[Control+E] la playa repetint fins arribar a EOF (oju als bucles infinits),
+//[Control+Z] undo
+//[Control+Y] redo.
+//[Control+T] nou tab
+//[Control+O] open file
+//[Control+S] save file
+//[Control+W] tanca tab
+//[Control+Q] quit
+//[Control+Z] undo
+//[Control+Y] redo
+//
+// TODO documentar el copy/paste
+//
+//f[text]  - cerca endavant (case sensitive)
+//F[text]  - cerca enrera (case sensitive)
+//@f[regexp]   - cerca endavant per regexp
+//#[numfila]   - go to # fila
+//u        - sel.lecció.toLowerCase()
+//U        - sel.lecció.toUpperCase()
+//!cal         - inserta la sortida d'un comando de línia
+
+//TODO Control+Up/Down (scroll) https://stackoverflow.com/questions/33862270/java-scrollpane-with-a-textarea-inside-can-not-scroll-to-top-programmatically
+// FIXME problema gordo: i com guardar les macros? els event que es graven
+// referencien als components JTextArea, no ho podem serialitzar tot!
+// TODO guardar macros a fitxer
+
+// TODO fer un Thread amb timer (Watchdog) que limiti el temps en fer [Control+E] i així trencar els bucles infinits de macro?
+// XXX repetició de macro fins EOF
+// TODO !cal funciona en Linux, falla en Win (!date)
+// XXX autoindent: en enter, segueix la tabulació de l'anterior fila.
+// TODO fer hotkey per botons Rec/PLay macro, i treure del MyKeyEventListener la
+// gestió d'aquestes tecles (que no són recordables).
+// create an Action doing what you want
+// Action action = new AbstractAction("doSomething") {
+//
+// @Override
+// public void actionPerformed(ActionEvent e) {
+// System.out.println("triggered the action");
+// }
+//
+// };
+//// configure the Action with the accelerator (aka: short cut)
+// action.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke("control S"));
+//
+//// create a button, configured with the Action
+// JButton toolBarButton = new JButton(action);
+//// manually register the accelerator in the button's component input map
+// toolBarButton.getActionMap().put("myAction", action);
+// toolBarButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+// (KeyStroke) action.getValue(Action.ACCELERATOR_KEY), "myAction");
+
 public class SupraEditor extends JFrame {
 
     private static final long serialVersionUID = 2054269406974939700L;
@@ -108,6 +87,10 @@ public class SupraEditor extends JFrame {
 
         // TODO
         // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+
+        // UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+        // SwingUtilities.updateComponentTreeUI(this);
+        // this.pack();
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -126,7 +109,6 @@ public class SupraEditor extends JFrame {
     final JMenuItem closeTabItem = new JMenuItem("Close Tab");
     final JMenuItem exitItem = new JMenuItem("Exit");
 
-    // Constructor: create a text editor with a menu
     public SupraEditor() {
         super("Supra Ed");
 

@@ -14,23 +14,25 @@ import javax.swing.text.BadLocationException;
 
 import org.homs.supraedit.util.ExceptionUtils;
 
-public class MyKeyEventDispatcher implements KeyEventDispatcher {
+public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
     final MacroRecording macroRecording;
     final JTextField cmdTextField;
 
     final Closure onDoRecord;
     final Closure onDoPlay;
+    final Closure onDoPlayEof;
     final Closure onTabToLeft;
     final Closure onTabToRight;
 
-    public MyKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onDoRecord,
-            Closure onDoPlay, Closure onTabToLeft, Closure onTabToRight) {
+    public SupraKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onDoRecord,
+            Closure onDoPlay, Closure onDoPlayEof, Closure onTabToLeft, Closure onTabToRight) {
         super();
         this.macroRecording = macroRecording;
         this.cmdTextField = cmdTextField;
         this.onDoRecord = onDoRecord;
         this.onDoPlay = onDoPlay;
+        this.onDoPlayEof = onDoPlayEof;
         this.onTabToLeft = onTabToLeft;
         this.onTabToRight = onTabToRight;
     }
@@ -124,6 +126,9 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                     cmdTextField.requestFocus();
                     break;
                 }
+                /**
+                 * CONSUMEIX EL [CONTROL+R] PQ NO EL POT GRAVAR!
+                 */
                 case KeyEvent.VK_R: {
                     if (controlPressed) {
                         onDoRecord.execute();
@@ -138,6 +143,30 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                     }
                     break;
                 }
+                case KeyEvent.VK_E: {
+                    if (controlPressed) {
+                        onDoPlayEof.execute();
+                        e.consume();
+                    }
+                    break;
+                }
+
+                // TODO [Control+Up]
+                // case KeyEvent.VK_UP: {
+                // if (controlPressed) {
+                // e.consume();
+                // }
+                // break;
+                // }
+
+                // TODO [Control+Down]
+                // case KeyEvent.VK_DOWN: {
+                // if (controlPressed) {
+                // e.consume();
+                // }
+                // break;
+                // }
+
                 case KeyEvent.VK_TAB: {
                     if (macroRecording.getTextArea().getSelectedText() != null) {
 
@@ -181,6 +210,36 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
 
             } else if (e.getID() == KeyEvent.KEY_TYPED) {
 
+                if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+
+                    /* AUTO-INDENTATION */
+                    JTextArea ta = macroRecording.getTextArea();
+                    int pos = ta.getCaretPosition();
+                    try {
+                        int currLine = ta.getLineOfOffset(pos);
+                        if (currLine > 0) {
+                            int antLine = currLine - 1;
+                            int beginAntLinePos = ta.getLineStartOffset(antLine);
+                            int endAntLineEndPos = ta.getLineEndOffset(antLine);
+
+                            int c;
+                            for (c = beginAntLinePos; c < endAntLineEndPos; c++) {
+                                char cc = ta.getDocument().getText(c, 1).charAt(0);
+                                if (!Character.isWhitespace(cc) || cc == '\n') {
+                                    break;
+                                }
+                            }
+
+                            String indentText = ta.getDocument().getText(beginAntLinePos, c - beginAntLinePos);
+                            ta.insert(indentText, ta.getCaretPosition());
+                        }
+
+                    } catch (Exception e2) {
+                        JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e2)));
+                        throw new RuntimeException(e2);
+                    }
+                }
+
             } else if (e.getID() == KeyEvent.KEY_RELEASED) {
 
                 int key = e.getKeyCode();
@@ -190,6 +249,7 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
                     this.shiftPressed = false;
                     break;
                 }
+
             }
 
             /**
@@ -202,11 +262,10 @@ public class MyKeyEventDispatcher implements KeyEventDispatcher {
         }
 
         return false;
+
     }
 
     private void processCommand(JTextArea textArea, String cmd) {
-
-        // System.out.println("cmd: " + cmd);
 
         if (cmd.startsWith("f")) {
             String cmdVal = cmd.substring(1);

@@ -54,6 +54,7 @@ public class EditorPane extends JPanel {
     final JButton lineWrapButton;
     final JButton recordMacroButton;
     final JButton playMacroButton;
+    final JButton playMacroEofButton;
     final JTextField cmdTextField;
 
     final JTextArea textArea;
@@ -76,6 +77,10 @@ public class EditorPane extends JPanel {
         playMacroButton.setMargin(new Insets(0, 0, 0, 0));
         menuBar.add(playMacroButton);
 
+        playMacroEofButton = new JButton("Play EOF");
+        playMacroEofButton.setMargin(new Insets(0, 0, 0, 0));
+        menuBar.add(playMacroEofButton);
+
         cmdTextField = new JTextField();
         menuBar.add(cmdTextField);
 
@@ -95,14 +100,41 @@ public class EditorPane extends JPanel {
                         macroRecording.recordMacroStop();
                         recordMacroButton.setText("Rec");
                         playMacroButton.setEnabled(true);
+                        playMacroEofButton.setEnabled(true);
                     } else {
                         macroRecording.recordMacroStart();
                         recordMacroButton.setText("Recording");
                         playMacroButton.setEnabled(false);
+                        playMacroEofButton.setEnabled(false);
                     }
                     textArea.requestFocus();
                 } else if (e.getSource() == playMacroButton) {
+
+                    recordMacroButton.setEnabled(false);
+                    playMacroButton.setEnabled(false);
+                    playMacroEofButton.setEnabled(false);
+
                     macroRecording.playMacro();
+
+                    playMacroButton.setEnabled(true);
+                    playMacroEofButton.setEnabled(true);
+                    recordMacroButton.setEnabled(true);
+
+                    textArea.requestFocus();
+                } else if (e.getSource() == playMacroEofButton) {
+
+                    recordMacroButton.setEnabled(false);
+                    playMacroButton.setEnabled(false);
+                    playMacroEofButton.setEnabled(false);
+
+                    while (textArea.getCaretPosition() < textArea.getDocument().getLength()) {
+                        macroRecording.playMacro();
+                    }
+
+                    playMacroButton.setEnabled(true);
+                    playMacroEofButton.setEnabled(true);
+                    recordMacroButton.setEnabled(true);
+
                     textArea.requestFocus();
                 }
 
@@ -112,6 +144,7 @@ public class EditorPane extends JPanel {
         lineWrapButton.addActionListener(actionListener);
         recordMacroButton.addActionListener(actionListener);
         playMacroButton.addActionListener(actionListener);
+        playMacroEofButton.addActionListener(actionListener);
         cmdTextField.addActionListener(actionListener);
 
         JScrollPane scrollPane = new JScrollPane(textArea);
@@ -192,6 +225,9 @@ public class EditorPane extends JPanel {
         Closure onDoPlay = () -> {
             playMacroButton.doClick();
         };
+        Closure onDoPlayEof = () -> {
+            playMacroEofButton.doClick();
+        };
         Closure onTabToLeft = () -> {
             JTabbedPane tabs = (JTabbedPane) getParent();
             int selected = tabs.getSelectedIndex();
@@ -211,8 +247,8 @@ public class EditorPane extends JPanel {
             }
         };
 
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new MyKeyEventDispatcher(
-                macroRecording, cmdTextField, onDoRecord, onDoPlay, onTabToLeft, onTabToRight));
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new SupraKeyEventDispatcher(
+                macroRecording, cmdTextField, onDoRecord, onDoPlay, onDoPlayEof, onTabToLeft, onTabToRight));
 
         textArea.requestFocus();
 
@@ -240,6 +276,11 @@ public class EditorPane extends JPanel {
 
     public void loadFile() {
         JFileChooser fc = new JFileChooser();
+        // fc.setCurrentDirectory(dir); //TODO
+        // fc.setFileView(fileView); //TODO
+        fc.setFileHidingEnabled(false);
+        fc.setPreferredSize(getSize());
+        fc.setPreferredSize(new Dimension(800, 800));
 
         JComboBox<String> encodingCombo;
         {
@@ -263,6 +304,7 @@ public class EditorPane extends JPanel {
         textArea.setCaretPosition(0);
     }
 
+    // TODO juntar els loadFile
     private void loadFile(String name, String charsetName) {
         try {
 
@@ -293,6 +335,11 @@ public class EditorPane extends JPanel {
 
         if (name == null) { // get filename from user
             JFileChooser fc = new JFileChooser();
+            // fc.setCurrentDirectory(dir); //TODO
+            // fc.setFileView(fileView); //TODO
+            fc.setFileHidingEnabled(false);
+            fc.setPreferredSize(getSize());
+            fc.setPreferredSize(new Dimension(800, 800));
 
             JComboBox<String> encodingCombo;
             {

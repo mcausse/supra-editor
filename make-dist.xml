@@ -6,7 +6,7 @@
 
 	<!--
 	<property name="mvn2-executable-path" location="C:\java\mavens\apache-maven-3.0.4\bin\mvn.bat" />
-	<property name="JAVA_HOME" location="C:\Program Files\Java\jdk1.6.0_45" />
+	<property name="JAVA_HOME" location="C:\java\jdk1.8.0_112" />
 	-->
 	<property name="mvn2-executable-path" location="/home/mhoms/java/apache-maven-3.2.3/bin/mvn" />
 	<property name="JAVA_HOME" location="/home/mhoms/java/jdk1.8.0_112" />
@@ -16,6 +16,7 @@
 		<delete includeemptydirs="true">
 			<fileset dir="${release-dir}" defaultexcludes="false">
 				<include name="*.jar" />
+				<include name="site" />
 			</fileset>
 		</delete>
 
@@ -23,11 +24,20 @@
 			<env key="JAVA_HOME" value="${JAVA_HOME}" />
 			<arg value="clean" />
 			<arg value="install" />
+			<arg value="site:site" />
 		</exec>
-		
-		<copy todir="${release-dir}" >  
+
+		<copy todir="${release-dir}">  
 		    <fileset dir="./target" includes="*.jar"/>  
 		</copy> 
+		<copy todir="${release-dir}/site">  
+			<fileset dir="./target/site" includes="**/*"/>
+		</copy>
+		
+		<zip destfile="${release-dir}/source.zip">
+			<fileset dir="./" includes="src/**/*" excludes="${release-dir}/**/*"/>
+			<fileset dir="./" includes="*.xml"/>
+		</zip>
 
 
 <!--
