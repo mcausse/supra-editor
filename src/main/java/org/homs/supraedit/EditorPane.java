@@ -95,6 +95,7 @@ public class EditorPane extends JPanel {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
                 if (e.getSource() == lineWrapButton) {
                     textArea.setLineWrap(!textArea.getLineWrap());
                     textArea.setWrapStyleWord(textArea.getLineWrap());
@@ -120,7 +121,12 @@ public class EditorPane extends JPanel {
                     playMacroMenuItem.setEnabled(false);
                     playMacroEofMenuItem.setEnabled(false);
 
-                    macroRecording.playMacro();
+                    try {
+                        macroRecording.playMacro();
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, ExceptionUtils.toString(ex), "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
 
                     playMacroMenuItem.setEnabled(true);
                     playMacroEofMenuItem.setEnabled(true);
@@ -133,8 +139,11 @@ public class EditorPane extends JPanel {
                     playMacroMenuItem.setEnabled(false);
                     playMacroEofMenuItem.setEnabled(false);
 
-                    while (textArea.getCaretPosition() < textArea.getDocument().getLength()) {
-                        macroRecording.playMacro();
+                    try {
+                        macroRecording.playMacroUntilEof();
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(null, ExceptionUtils.toString(ex), "Error",
+                                JOptionPane.ERROR_MESSAGE);
                     }
 
                     playMacroMenuItem.setEnabled(true);
@@ -256,8 +265,15 @@ public class EditorPane extends JPanel {
             }
         };
 
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(
-                new SupraKeyEventDispatcher(macroRecording, cmdTextField, onTabToLeft, onTabToRight));
+        Closure onScrollUp = () -> {
+            scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() - 20);
+        };
+        Closure onScrollDown = () -> {
+            scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() + 20);
+        };
+
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new SupraKeyEventDispatcher(
+                macroRecording, cmdTextField, onTabToLeft, onTabToRight, onScrollUp, onScrollDown));
 
         textArea.requestFocus();
     }

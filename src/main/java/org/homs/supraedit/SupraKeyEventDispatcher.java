@@ -4,6 +4,7 @@ import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,14 +22,20 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
     final Closure onTabToLeft;
     final Closure onTabToRight;
+    final Closure onScrollUp;
+    final Closure onScrollDown;
+
+    final Stack<Integer> markerPositionsStack = new Stack<>();
 
     public SupraKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onTabToLeft,
-            Closure onTabToRight) {
+            Closure onTabToRight, Closure onScrollUp, Closure onScrollDown) {
         super();
         this.macroRecording = macroRecording;
         this.cmdTextField = cmdTextField;
         this.onTabToLeft = onTabToLeft;
         this.onTabToRight = onTabToRight;
+        this.onScrollUp = onScrollUp;
+        this.onScrollDown = onScrollDown;
     }
 
     boolean controlPressed = false;
@@ -66,16 +73,17 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
             }
         }
 
+        JTextArea textArea = macroRecording.getTextArea();
+
         if (e.getSource() == cmdTextField) {
 
             if (e.getID() == KeyEvent.KEY_TYPED) {
                 if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
-                    macroRecording.getTextArea().requestFocus();
+                    textArea.requestFocus();
                 }
             }
 
             if (e.getID() == KeyEvent.KEY_TYPED && e.getKeyChar() == KeyEvent.VK_ENTER) {
-                JTextArea textArea = macroRecording.getTextArea();
                 String cmd = cmdTextField.getText();
                 try {
                     processCommand(textArea, cmd);
@@ -92,7 +100,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
             macroRecording.record(e);
         }
 
-        if (e.getSource() == macroRecording.getTextArea()) {
+        if (e.getSource() == textArea) {
 
             if (e.getID() == KeyEvent.KEY_PRESSED) {
 
@@ -122,59 +130,37 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                     cmdTextField.setSelectionEnd(cmdTextField.getText().length());
                     break;
                 }
-
-                // TODO [Control+Up]
-                // case KeyEvent.VK_UP: {
-                // if (controlPressed) {
-                // e.consume();
-                // }
-                // break;
-                // }
-
-                // TODO [Control+Down]
-                // case KeyEvent.VK_DOWN: {
-                // if (controlPressed) {
-                // e.consume();
-                // }
-                // break;
-                // }
-
+                case KeyEvent.VK_UP: {
+                    if (controlPressed) {
+                        onScrollUp.execute();
+                        e.consume();
+                    }
+                    break;
+                }
+                case KeyEvent.VK_DOWN: {
+                    if (controlPressed) {
+                        onScrollDown.execute();
+                        e.consume();
+                    }
+                    break;
+                }
                 case KeyEvent.VK_TAB: {
-                    if (macroRecording.getTextArea().getSelectedText() != null) {
+                    if (textArea.getSelectedText() != null) {
 
+                        int ini = textArea.getSelectionStart();
+                        String selection = textArea.getSelectedText();
                         if (shiftPressed) {
-
-                            int ini = macroRecording.getTextArea().getSelectionStart();
-
-                            String selection = macroRecording.getTextArea().getSelectedText();
-
-                            selection = selection.replaceAll("^\\s+", "");
-                            selection = selection.replaceAll("\\n\\s+", "\n");
-
-                            macroRecording.getTextArea().replaceSelection(selection);
-
-                            macroRecording.getTextArea().setSelectionStart(ini);
-                            macroRecording.getTextArea().setSelectionEnd(ini + selection.length());
-
-                            macroRecording.record(e);
-                            e.consume();
+                            selection = selection.replaceAll("^\\s", "");
+                            selection = selection.replaceAll("\\n\\s", "\n");
                         } else {
-
-                            int ini = macroRecording.getTextArea().getSelectionStart();
-
-                            String selection = macroRecording.getTextArea().getSelectedText();
-
                             selection = selection.replaceAll("^", "\t");
                             selection = selection.replaceAll("\\n", "\n\t");
-
-                            macroRecording.getTextArea().replaceSelection(selection);
-
-                            macroRecording.getTextArea().setSelectionStart(ini);
-                            macroRecording.getTextArea().setSelectionEnd(ini + selection.length());
-
-                            macroRecording.record(e);
-                            e.consume();
                         }
+                        textArea.replaceSelection(selection);
+                        textArea.setSelectionStart(ini);
+                        textArea.setSelectionEnd(ini + selection.length());
+                        macroRecording.record(e);
+                        e.consume();
                     }
                     break;
                 }
@@ -185,7 +171,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 
                     /* AUTO-INDENTATION */
-                    JTextArea ta = macroRecording.getTextArea();
+                    JTextArea ta = textArea;
                     int pos = ta.getCaretPosition();
                     try {
                         int currLine = ta.getLineOfOffset(pos);
@@ -382,7 +368,14 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e)));
                 throw new RuntimeException(e);
             }
+        } else if (cmd.startsWith("[")) {
+            this.markerPositionsStack.push(textArea.getCaretPosition());
+            textArea.requestFocus();
+        } else if (cmd.startsWith("]")) {
+            textArea.setCaretPosition(this.markerPositionsStack.pop());
+            textArea.requestFocus();
         } else {
+            textArea.requestFocus();
             throw new RuntimeException("illegal command: " + cmd);
         }
     }

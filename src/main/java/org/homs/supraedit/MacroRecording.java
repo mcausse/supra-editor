@@ -20,6 +20,8 @@ import org.homs.supraedit.util.ExceptionUtils;
 
 public class MacroRecording {
 
+    final static long MACRO_TIME_OUT_INS_SECS = 5L;
+
     final JTextArea textArea;
     final JTextField cmdTextField;
 
@@ -74,6 +76,7 @@ public class MacroRecording {
         // eventsRecorded.addAll(eventsRecorded2);
         // }
 
+        long t1 = System.currentTimeMillis();
         for (KeyEvent e : eventsRecorded) {
             if (e.getSource() == textArea) {
                 cmdTextField.requestFocus();
@@ -88,6 +91,27 @@ public class MacroRecording {
             if (textArea.getCaretPosition() >= textArea.getDocument().getLength()) {
                 // EOF => abortar
                 break;
+            }
+            if (System.currentTimeMillis() - t1 > MACRO_TIME_OUT_INS_SECS * 1000L) {
+                throw new RuntimeException("macro timed out (limit is " + MACRO_TIME_OUT_INS_SECS + " secs)");
+            }
+        }
+    }
+
+    public void playMacroUntilEof() {
+        isRecording = false;
+
+        long t1 = System.currentTimeMillis();
+        while (true) {
+
+            playMacro();
+
+            if (textArea.getCaretPosition() >= textArea.getDocument().getLength()) {
+                // EOF => abortar
+                break;
+            }
+            if (System.currentTimeMillis() - t1 > MACRO_TIME_OUT_INS_SECS * 1000L) {
+                throw new RuntimeException("macro timed out (limit is " + MACRO_TIME_OUT_INS_SECS + " secs)");
             }
         }
     }

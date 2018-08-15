@@ -3,20 +3,31 @@
 
 Edit mode:
 
+   [Control+T] nou tab
    [Alt+left]/[Alt+right] tabs
+   [Control+W] tanca tab
+
    [Control+R] engega/atura la grabació de macro,
    [Control+P] la playa,
    [Control+E] la playa repetint fins arribar a EOF (oju als bucles infinits),
-   [Control+T] nou tab
+   
    [Control+O] open file
    [Control+S] save file
-   [Control+W] tanca tab
+   
    [Control+Q] quit
    [Control+Z] undo
    [Control+Y] redo
    [Control+X] cut
    [Control+C], [Control+Insert] copy
    [Control+P], [Shift+Insert] paste
+   
+   [Selection+Tab] tabula bloc
+   [Selection+Shift+Tab] destabula bloc
+
+   [Control-Left] left word
+   [Control-Right] right word
+   [Control+Up] scroll up
+   [Control+Down] scroll down
 
  Command mode:
 
@@ -26,4 +37,6 @@ Edit mode:
    #[numfila]   - go to # fila
    u            - sel.lecció.toLowerCase()
    U            - sel.lecció.toUpperCase()
-   !cal         - inserta la sortida d'un comando de línia
+   ![cmd]       - inserta la sortida d'un comando de línia
+   [            - push cursor position marker
+   ]            - pop cursor position marker

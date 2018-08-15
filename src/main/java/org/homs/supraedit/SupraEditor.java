@@ -21,10 +21,11 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-// TODO Control+Up/Down (scroll) https://stackoverflow.com/questions/33862270/java-scrollpane-with-a-textarea-inside-can-not-scroll-to-top-programmatically
-// TODO fer un Thread amb timer (Watchdog) que limiti el temps en fer [Control+E] i així trencar els bucles infinits de macro?
 // TODO !cal funciona en Linux, falla en Win (!date, !dir, ... hauria de ser un comando de fitxer de veritat...)
 
+// XXX comandos [ i ] (markers stack)
+// XXX Control+Up/Down (scroll) https://stackoverflow.com/questions/33862270/java-scrollpane-with-a-textarea-inside-can-not-scroll-to-top-programmatically
+// XXX fer un Thread amb timer (Watchdog) que limiti el temps en fer [Control+E] i així trencar els bucles infinits de macro?
 // XXX en fer [Esc] i passar a command mode, focusar l'input text amb tot el valor sel.leccionat
 // (i donar color i estil com a la sel.lecció de text).
 // XXX problema gordo: i com guardar les macros? els event que es graven

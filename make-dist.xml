@@ -16,7 +16,7 @@
 		<delete includeemptydirs="true">
 			<fileset dir="${release-dir}" defaultexcludes="false">
 				<include name="*.jar" />
-				<include name="site" />
+				<!--<include name="site" />-->
 			</fileset>
 		</delete>
 
@@ -24,15 +24,17 @@
 			<env key="JAVA_HOME" value="${JAVA_HOME}" />
 			<arg value="clean" />
 			<arg value="install" />
-			<arg value="site:site" />
+			<!--<arg value="site:site" />-->
 		</exec>
 
 		<copy todir="${release-dir}">  
 		    <fileset dir="./target" includes="*.jar"/>  
 		</copy> 
+		<!--
 		<copy todir="${release-dir}/site">  
 			<fileset dir="./target/site" includes="**/*"/>
 		</copy>
+		-->
 		
 		<zip destfile="${release-dir}/source.zip">
 			<fileset dir="./" includes="src/**/*" excludes="${release-dir}/**/*"/>

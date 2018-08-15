@@ -45,11 +45,16 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 
     private static final long serialVersionUID = -5052634532866910124L;
 
+    static final Color lineForeground = Color.BLACK;
+    static final Color lineBackground = Color.GRAY;
+    static final Color currLineForeground = Color.WHITE;
+    static final Color currLineBackground = Color.RED;
+
     public final static float LEFT = 0.0f;
     public final static float CENTER = 0.5f;
     public final static float RIGHT = 1.0f;
 
-    private final static Border OUTER = new MatteBorder(0, 0, 0, 2, Color.GRAY);
+    private final static Border OUTER = new MatteBorder(0, 0, 0, 1, lineForeground);
 
     private final static int HEIGHT = Integer.MAX_VALUE - 1000000;
 
@@ -61,7 +66,6 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 
     private boolean updateFont;
     private int borderGap;
-    private Color currentLineForeground;
     private float digitAlignment;
     private int minimumDisplayDigits;
 
@@ -100,7 +104,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         setFont(component.getFont());
 
         setBorderGap(5);
-        setCurrentLineForeground(Color.RED);
+        // setCurrentLineForeground(currentLineForeground);
         setDigitAlignment(RIGHT);
         setMinimumDisplayDigits(minimumDisplayDigits);
 
@@ -152,25 +156,6 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         setBorder(new CompoundBorder(OUTER, inner));
         lastDigits = 0;
         setPreferredWidth();
-    }
-
-    /**
-     * Gets the current line rendering Color
-     *
-     * @return the Color used to render the current line number
-     */
-    public Color getCurrentLineForeground() {
-        return currentLineForeground == null ? getForeground() : currentLineForeground;
-    }
-
-    /**
-     * The Color used to render the current line digits. Default is Coolor.RED.
-     *
-     * @param currentLineForeground
-     *            the Color used to render the current line
-     */
-    public void setCurrentLineForeground(Color currentLineForeground) {
-        this.currentLineForeground = currentLineForeground;
     }
 
     /**
@@ -265,9 +250,9 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         while (rowStartOffset <= endOffset) {
             try {
                 if (isCurrentLine(rowStartOffset)) {
-                    g.setColor(getCurrentLineForeground());
+                    g.setColor(currLineForeground);
                 } else {
-                    g.setColor(getForeground());
+                    g.setColor(lineForeground);
                 }
 
                 // Get the line number as a string and then determine the
@@ -280,10 +265,11 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 
                 // XXX sombra del # de fila actual
                 if (isCurrentLine(rowStartOffset)) {
-                    g.setColor(Color.RED);
+
+                    g.setColor(currLineBackground);
                     g.fillRect(x, y - fontMetrics.getHeight() + fontMetrics.getHeight() / 4, stringWidth,
                             fontMetrics.getHeight());
-                    g.setColor(Color.WHITE);
+                    g.setColor(currLineForeground);
                 }
 
                 g.drawString(lineNumber, x, y);
