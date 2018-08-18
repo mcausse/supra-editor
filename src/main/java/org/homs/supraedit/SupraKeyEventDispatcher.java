@@ -45,6 +45,10 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
 
+        if (e.getSource() == cmdTextField || e.getSource() == macroRecording.getTextArea()) {
+            macroRecording.record(e);
+        }
+
         /*
          * la gestió de la tecla [Alt] és comuna entre tots els tabs: això permet
          * conmutar fluidament entre ells sense deixar anar el [Alt] (fent [Alt+left] i
@@ -93,11 +97,6 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                     e2.printStackTrace();
                 }
             }
-
-            /**
-             * IMPORTANTISSIM: REGISTRA TOT LO TECLEJAT EN L'INPUT-TEXT DE COMANDES
-             */
-            macroRecording.record(e);
         }
 
         if (e.getSource() == textArea) {
@@ -159,7 +158,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                         textArea.replaceSelection(selection);
                         textArea.setSelectionStart(ini);
                         textArea.setSelectionEnd(ini + selection.length());
-                        macroRecording.record(e);
+                        // macroRecording.record(e);
                         e.consume();
                     }
                     break;
@@ -209,14 +208,6 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 }
 
             }
-
-            /**
-             * IMPORTANTISSIM: REGISTRA TOT LO NO CONSUMIT!!!!!
-             */
-            if (!e.isConsumed()) {
-                macroRecording.record(e);
-            }
-
         }
 
         return false;

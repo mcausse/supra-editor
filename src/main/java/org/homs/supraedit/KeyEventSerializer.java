@@ -61,9 +61,6 @@ public class KeyEventSerializer {
         final int keyCode;
         final char keyChar;
 
-        // Component source, int id, long when, int modifiers,
-        // int keyCode, char keyChar, int keyLocation
-
         public KeyEventWrapper(KeyEvent ke) {
             super();
             this.componentSourceClassName = ke.getSource().getClass().getName();
