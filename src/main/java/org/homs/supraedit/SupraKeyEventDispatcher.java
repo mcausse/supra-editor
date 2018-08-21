@@ -237,19 +237,6 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 }
             }
 
-            // // TODO
-            // try {
-            // int pos = textArea.getCaretPosition();
-            // Highlighter highlighter = textArea.getHighlighter();
-            // HighlightPainter painter = new
-            // DefaultHighlighter.DefaultHighlightPainter(Color.pink);
-            // highlighter.addHighlight(pos, pos + textLength, painter);
-            // } catch (BadLocationException ex) {
-            // throw new RuntimeException(ex);
-            // }
-
-            // TODO
-            // JOptionPane.showMessageDialog(null, new JTePane(textArea));
         } else if (cmd.startsWith("F")) {
 
             String cmdVal = cmd.substring(1);
@@ -270,18 +257,6 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 }
             }
 
-            // TODO
-            // try {
-            // Highlighter highlighter = textArea.getHighlighter();
-            // HighlightPainter painter = new
-            // DefaultHighlighter.DefaultHighlightPainter(Color.pink);
-            // highlighter.addHighlight(pos, pos + text.length(), painter);
-            // } catch (BadLocationException e) {
-            // throw new RuntimeException(e);
-            // }
-
-            // TODO
-            // JOptionPane.showMessageDialog(null, new JTePane(textArea));
         } else if (cmd.startsWith("@f")) {
             String regexp = cmd.substring(2);
             int textLength = textArea.getDocument().getLength();
@@ -342,13 +317,34 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
         } else if (cmd.startsWith("!")) {
             String command = cmd.substring(1);
             try {
-                Process p = Runtime.getRuntime().exec(command);
-                p.waitFor();
 
                 StringBuilder sb = new StringBuilder();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                String line = "";
-                while ((line = reader.readLine()) != null) {
+
+                // Process p = Runtime.getRuntime().exec(command);
+                // p.waitFor();
+                //
+                // BufferedReader reader = new BufferedReader(new
+                // InputStreamReader(p.getInputStream()));
+                // String line = "";
+                // while ((line = reader.readLine()) != null) {
+                // sb.append(line + "\n");
+                // }
+                //
+
+                // ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c",
+                // "cd \"C:\\Program Files\\Microsoft SQL Server\" && dir");
+                // ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
+                ProcessBuilder builder = new ProcessBuilder(command);
+                builder.redirectErrorStream(true);
+                Process p = builder.start();
+                BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line;
+                while (true) {
+                    line = r.readLine();
+                    if (line == null) {
+                        break;
+                    }
+                    // System.out.println(line);
                     sb.append(line + "\n");
                 }
 

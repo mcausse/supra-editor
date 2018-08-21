@@ -48,7 +48,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
     static final Color lineForeground = Color.BLACK;
     static final Color lineBackground = Color.GRAY;
     static final Color currLineForeground = Color.WHITE;
-    static final Color currLineBackground = Color.RED;
+    static final Color currLineBackground = Color.GRAY;
 
     public final static float LEFT = 0.0f;
     public final static float CENTER = 0.5f;

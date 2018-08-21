@@ -61,7 +61,7 @@ public class MacroRecording {
         isRecording = false;
 
         // /**
-        // * TODO prova de serialització de macros!!!! sembla que funciona
+        // * XXX prova de serialització de macros!!!! sembla que funciona
         // */
         // {
         // KeyEventSerializer s = new KeyEventSerializer();
@@ -118,7 +118,6 @@ public class MacroRecording {
 
     public void loadFile() {
         JFileChooser fc = new JFileChooser();
-        // fc.setCurrentDirectory(dir); //TODO
         fc.setFileHidingEnabled(false);
         fc.setPreferredSize(new Dimension(800, 800));
 
@@ -156,7 +155,6 @@ public class MacroRecording {
     public void saveFile() {
 
         JFileChooser fc = new JFileChooser();
-        // fc.setCurrentDirectory(dir); //TODO
         fc.setFileHidingEnabled(false);
         fc.setPreferredSize(new Dimension(800, 800));
 

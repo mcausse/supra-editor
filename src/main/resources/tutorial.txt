@@ -9,7 +9,7 @@ Edit mode:
 
    [Control+R] engega/atura la grabació de macro,
    [Control+P] la playa,
-   [Control+E] la playa repetint fins arribar a EOF (oju als bucles infinits),
+   [Control+E] la playa repetint fins arribar a EOF.
    
    [Control+O] open file
    [Control+S] save file

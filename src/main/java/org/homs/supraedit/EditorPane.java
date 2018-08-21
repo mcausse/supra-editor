@@ -300,9 +300,13 @@ public class EditorPane extends JPanel {
 
     public void loadFile() {
         JFileChooser fc = new JFileChooser();
-        // fc.setCurrentDirectory(dir); //TODO
+
+        if (this.filename != null) {
+            File dir = new File(this.filename).getParentFile();
+            fc.setCurrentDirectory(dir);
+        }
+
         fc.setFileHidingEnabled(false);
-        // fc.setPreferredSize(getSize());
         fc.setPreferredSize(new Dimension(800, 800));
 
         JComboBox<String> encodingCombo;
@@ -353,7 +357,12 @@ public class EditorPane extends JPanel {
 
         if (name == null) { // get filename from user
             JFileChooser fc = new JFileChooser();
-            // fc.setCurrentDirectory(dir); //TODO
+
+            if (this.filename != null) {
+                File dir = new File(this.filename).getParentFile();
+                fc.setCurrentDirectory(dir);
+            }
+
             fc.setFileHidingEnabled(false);
             // fc.setPreferredSize(getSize());
             fc.setPreferredSize(new Dimension(800, 800));

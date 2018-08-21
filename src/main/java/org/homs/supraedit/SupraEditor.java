@@ -4,37 +4,23 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-// TODO !cal funciona en Linux, falla en Win (!date, !dir, ... hauria de ser un comando de fitxer de veritat...)
-
-// XXX comandos [ i ] (markers stack)
-// XXX Control+Up/Down (scroll) https://stackoverflow.com/questions/33862270/java-scrollpane-with-a-textarea-inside-can-not-scroll-to-top-programmatically
-// XXX fer un Thread amb timer (Watchdog) que limiti el temps en fer [Control+E] i així trencar els bucles infinits de macro?
-// XXX en fer [Esc] i passar a command mode, focusar l'input text amb tot el valor sel.leccionat
-// (i donar color i estil com a la sel.lecció de text).
-// XXX problema gordo: i com guardar les macros? els event que es graven
-// referencien als components JTextArea, no ho podem serialitzar tot! (veure KeyEventSerializer !!!!!)
-// XXX guardar macros a fitxer
-// XXX repetició de macro fins EOF
-// XXX autoindent: en enter, segueix la tabulació de l'anterior fila.
-// XXX fer hotkey per botons Rec/PLay macro, i treure del MyKeyEventListener la
-// gestió d'aquestes tecles (que no són recordables).
 
 public class SupraEditor extends JFrame {
 
@@ -43,7 +29,7 @@ public class SupraEditor extends JFrame {
     public static void main(String args[]) throws ClassNotFoundException, InstantiationException,
             IllegalAccessException, UnsupportedLookAndFeelException {
 
-        // TODO l&f
+        // XXX l&f
         // JFrame.setDefaultLookAndFeelDecorated(true);
         // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 
@@ -65,25 +51,19 @@ public class SupraEditor extends JFrame {
     final JMenuItem exitItem = new JMenuItem("Exit");
 
     public SupraEditor() {
-        super("Supra Ed");
+        super("E");
 
         {
-            java.net.URL imgURL = getClass().getClassLoader().getResource("idcon.png");
+            java.net.URL imgURL = getClass().getClassLoader().getResource("void.png");
             ImageIcon icon = new ImageIcon(imgURL);
             setIconImage(icon.getImage());
         }
 
-        /**
-         * Toolkit.getDefaultToolkit ().getMenuShortcutKeyMask() returns control key
-         * (ctrl) on Windows and linux, and command key (⌘) on Mac OS.
-         *
-         * TODO forçar que sigui amb el Control
-         */
-        newItem.setAccelerator(KeyStroke.getKeyStroke('T', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        openItem.setAccelerator(KeyStroke.getKeyStroke('O', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        saveItem.setAccelerator(KeyStroke.getKeyStroke('S', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        closeTabItem.setAccelerator(KeyStroke.getKeyStroke('W', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        exitItem.setAccelerator(KeyStroke.getKeyStroke('Q', Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        newItem.setAccelerator(KeyStroke.getKeyStroke('T', InputEvent.CTRL_DOWN_MASK));
+        openItem.setAccelerator(KeyStroke.getKeyStroke('O', InputEvent.CTRL_DOWN_MASK));
+        saveItem.setAccelerator(KeyStroke.getKeyStroke('S', InputEvent.CTRL_DOWN_MASK));
+        closeTabItem.setAccelerator(KeyStroke.getKeyStroke('W', InputEvent.CTRL_DOWN_MASK));
+        exitItem.setAccelerator(KeyStroke.getKeyStroke('Q', InputEvent.CTRL_DOWN_MASK));
 
         fileMenu.add(newItem);
         fileMenu.add(openItem);
@@ -142,7 +122,13 @@ public class SupraEditor extends JFrame {
                     tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
                     tabbedPane.getComponent(tabbedPane.getTabCount() - 1).requestFocus();
                 } else if (e.getSource() == exitItem) {
-                    System.exit(0);
+
+                    int dialogButton = JOptionPane.YES_NO_OPTION;
+                    int dialogResult = JOptionPane.showConfirmDialog(null, "Quit?", "Warning", dialogButton);
+                    if (dialogResult == JOptionPane.YES_OPTION) {
+                        System.exit(0);
+                    }
+
                 }
 
             }
