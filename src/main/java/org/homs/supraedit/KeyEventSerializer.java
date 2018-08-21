@@ -87,6 +87,26 @@ public class KeyEventSerializer {
             return new KeyEvent(component, id, System.currentTimeMillis(), modifiers, keyCode, keyChar);
         }
 
+        // XXX
+        // private void writeObject(ObjectOutputStream oos) throws IOException {
+        // // default serialization
+        // oos.defaultWriteObject();
+        // // write the object
+        // // oos.writeInt(location.x);
+        // // oos.writeInt(location.y);
+        // // oos.writeInt(location.z);
+        // // oos.writeInt(location.uid);
+        // }
+        //
+        // private void readObject(ObjectInputStream ois) throws ClassNotFoundException,
+        // IOException {
+        // // default deserialization
+        // ois.defaultReadObject();
+        // // location = new Location(ois.readInt(), ois.readInt(), ois.readInt(),
+        // // ois.readInt());
+        // // // ... more code
+        //
+        // }
     }
 
 }
