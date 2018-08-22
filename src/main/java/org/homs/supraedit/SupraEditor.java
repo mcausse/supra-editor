@@ -51,10 +51,10 @@ public class SupraEditor extends JFrame {
     final JMenuItem exitItem = new JMenuItem("Exit");
 
     public SupraEditor() {
-        super("E");
+        super(".");
 
         {
-            java.net.URL imgURL = getClass().getClassLoader().getResource("void.png");
+            java.net.URL imgURL = getClass().getClassLoader().getResource("e64.png");
             ImageIcon icon = new ImageIcon(imgURL);
             setIconImage(icon.getImage());
         }
@@ -106,7 +106,7 @@ public class SupraEditor extends JFrame {
                     p.requestFocus();
                 } else if (e.getSource() == openItem) {
                     EditorPane p = new EditorPane();
-                    tabbedPane.addTab("?", null, p, "???");
+                    tabbedPane.addTab("  ?  ", null, p, "???");
                     tabbedPane.setSelectedComponent(p);
                     p.loadFile();
                     p.requestFocus();
@@ -115,7 +115,7 @@ public class SupraEditor extends JFrame {
                 } else if (e.getSource() == saveAsItem) {
                     getCurrEditorPane().saveFile(true);
                 } else if (e.getSource() == closeTabItem) {
-                    if (tabbedPane.getTabCount() - 1 <= 0) {
+                    if (tabbedPane.getTabCount() <= 1) {
                         return;
                     }
                     tabbedPane.remove(tabbedPane.getSelectedIndex());
@@ -128,11 +128,10 @@ public class SupraEditor extends JFrame {
                     if (dialogResult == JOptionPane.YES_OPTION) {
                         System.exit(0);
                     }
-
                 }
-
             }
         };
+
         newItem.addActionListener(actionListener);
         openItem.addActionListener(actionListener);
         saveItem.addActionListener(actionListener);
@@ -143,20 +142,27 @@ public class SupraEditor extends JFrame {
         /**
          * si un tab rep el focus, el passa al seu textarea
          */
-        tabbedPane.addFocusListener(new FocusListener() {
+        {
+            JFrame selfFrame = this;
+            tabbedPane.addFocusListener(new FocusListener() {
 
-            @Override
-            public void focusGained(FocusEvent e) {
-                JTabbedPane tabs = (JTabbedPane) e.getSource();
-                if (tabs.getSelectedComponent() instanceof EditorPane) {
-                    ((EditorPane) tabs.getSelectedComponent()).textArea.requestFocus();
+                @Override
+                public void focusGained(FocusEvent e) {
+                    JTabbedPane tabs = (JTabbedPane) e.getSource();
+                    if (tabs.getSelectedComponent() instanceof EditorPane) {
+                        EditorPane editorPane = (EditorPane) tabs.getSelectedComponent();
+                        editorPane.textArea.requestFocus();
+
+                        // TODO
+                        // selfFrame.setTitle(tabs.getTitleAt(tabs.getSelectedIndex()));
+                    }
                 }
-            }
 
-            @Override
-            public void focusLost(FocusEvent e) {
-            }
-        });
+                @Override
+                public void focusLost(FocusEvent e) {
+                }
+            });
+        }
 
         UIManager.put("Caret.width", 3);
         setVisible(true);
