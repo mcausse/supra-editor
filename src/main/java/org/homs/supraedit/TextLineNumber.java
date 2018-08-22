@@ -46,7 +46,7 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
     private static final long serialVersionUID = -5052634532866910124L;
 
     static final Color lineForeground = Color.BLACK;
-    static final Color lineBackground = Color.GRAY;
+    static final Color lineBackground = Color.WHITE;
     static final Color currLineForeground = Color.WHITE;
     static final Color currLineBackground = Color.GRAY;
 
@@ -104,13 +104,15 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
         setFont(component.getFont());
 
         setBorderGap(5);
-        // setCurrentLineForeground(currentLineForeground);
+
         setDigitAlignment(RIGHT);
         setMinimumDisplayDigits(minimumDisplayDigits);
 
         component.getDocument().addDocumentListener(this);
         component.addCaretListener(this);
         component.addPropertyChangeListener("font", this);
+
+        setBackground(lineBackground);
     }
 
     /**
@@ -249,11 +251,6 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
 
         while (rowStartOffset <= endOffset) {
             try {
-                if (isCurrentLine(rowStartOffset)) {
-                    g.setColor(currLineForeground);
-                } else {
-                    g.setColor(lineForeground);
-                }
 
                 // Get the line number as a string and then determine the
                 // "X" and "Y" offsets for drawing the string.
@@ -270,6 +267,8 @@ public class TextLineNumber extends JPanel implements CaretListener, DocumentLis
                     g.fillRect(x, y - fontMetrics.getHeight() + fontMetrics.getHeight() / 4, stringWidth,
                             fontMetrics.getHeight());
                     g.setColor(currLineForeground);
+                } else {
+                    g.setColor(lineForeground);
                 }
 
                 g.drawString(lineNumber, x, y);

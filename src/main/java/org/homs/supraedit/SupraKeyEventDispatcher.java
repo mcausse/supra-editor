@@ -41,6 +41,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
     boolean controlPressed = false;
     boolean altPressed = false;
     boolean shiftPressed = false;
+    int onShiftCaretPosition;
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent e) {
@@ -108,6 +109,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 switch (key) {
                 case KeyEvent.VK_SHIFT:
                     this.shiftPressed = true;
+                    this.onShiftCaretPosition = textArea.getCaretPosition();
                     break;
                 case KeyEvent.VK_LEFT: {
                     if (altPressed) {
@@ -158,7 +160,59 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                         textArea.replaceSelection(selection);
                         textArea.setSelectionStart(ini);
                         textArea.setSelectionEnd(ini + selection.length());
-                        // macroRecording.record(e);
+                        e.consume();
+                    }
+                    break;
+                }
+
+                case KeyEvent.VK_HOME: {
+
+                    if (!controlPressed) {
+
+                        // busca la pos del primer caràcter de la fila, després de possibles espais i
+                        // tabuladors
+
+                        JTextArea ta = textArea;
+                        try {
+
+                            int currLine = ta.getLineOfOffset(ta.getCaretPosition());
+                            int realBegin = ta.getLineStartOffset(currLine);
+                            int realEnd = ta.getLineEndOffset(currLine);
+
+                            int charsBegin = realBegin;
+                            while (charsBegin < realEnd - 1) {
+                                char currChar = ta.getDocument().getText(charsBegin, 1).charAt(0);
+                                if (!Character.isWhitespace(currChar)) {
+                                    break;
+                                }
+                                charsBegin++;
+                            }
+
+                            if (shiftPressed) {
+                                // si ja estava en el charsBegin, vés al realBegin, sinó al charsBegin
+                                if (ta.getCaretPosition() == charsBegin) {
+                                    ta.setCaretPosition(onShiftCaretPosition);
+                                    ta.moveCaretPosition(realBegin);
+                                } else {
+                                    // TODO usar "moveCaretPosition" en f, F i @f
+                                    ta.setCaretPosition(onShiftCaretPosition);
+                                    ta.moveCaretPosition(charsBegin);
+                                }
+
+                            } else {
+                                // si ja estava en el charsBegin, vés al realBegin, sinó al charsBegin
+                                if (ta.getCaretPosition() == charsBegin) {
+                                    ta.setCaretPosition(realBegin);
+                                } else {
+                                    ta.setCaretPosition(charsBegin);
+                                }
+                            }
+
+                        } catch (BadLocationException e1) {
+                            JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e1)));
+                            throw new RuntimeException(e1);
+                        }
+
                         e.consume();
                     }
                     break;
@@ -167,10 +221,16 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
             } else if (e.getID() == KeyEvent.KEY_TYPED) {
 
+                JTextArea ta = textArea;
+
+                // if (e.getKeyCode() == KeyEvent.VK_BEGIN) {
+                //
+                //
+                // } else
+
                 if (e.getKeyChar() == KeyEvent.VK_ENTER) {
 
                     /* AUTO-INDENTATION */
-                    JTextArea ta = textArea;
                     int pos = ta.getCaretPosition();
                     try {
                         int currLine = ta.getLineOfOffset(pos);

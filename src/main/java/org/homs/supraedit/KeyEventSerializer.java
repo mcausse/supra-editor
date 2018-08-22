@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.homs.supraedit.util.SerializationUtils;
 
+//TODO serialitzar a Properties??
 public class KeyEventSerializer {
 
     public void save(List<KeyEvent> events, String fileName) {

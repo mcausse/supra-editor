@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+// TODO deprecar en fer "serialitzar a Properties??"
 public class SerializationUtils {
 
     /**
