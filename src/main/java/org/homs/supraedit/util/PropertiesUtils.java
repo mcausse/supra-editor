@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-//TODO serialitzar a Properties??
 public class PropertiesUtils {
 
     final File file;
