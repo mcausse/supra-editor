@@ -91,46 +91,50 @@ public class SupraEditor extends JFrame {
             setSize(new Dimension(bounds.width, bounds.height));
         }
 
-        ActionListener actionListener = new ActionListener() {
+        ActionListener actionListener;
+        {
+            JFrame selfFrame = this;
+            actionListener = new ActionListener() {
 
-            public EditorPane getCurrEditorPane() {
-                return (EditorPane) tabbedPane.getSelectedComponent();
-            }
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (e.getSource() == newItem) {
+                        EditorPane p = new EditorPane();
+                        tabbedPane.addTab("  ?  ", null, p, "???");
+                        tabbedPane.setSelectedComponent(p);
+                        p.requestFocus();
+                    } else if (e.getSource() == openItem) {
+                        EditorPane p = new EditorPane();
+                        tabbedPane.addTab("  ?  ", null, p, "???");
+                        tabbedPane.setSelectedComponent(p);
+                        p.loadFile();
+                        p.requestFocus();
+                    } else if (e.getSource() == saveItem) {
+                        ((EditorPane) tabbedPane.getSelectedComponent()).saveFile(false);
+                    } else if (e.getSource() == saveAsItem) {
+                        ((EditorPane) tabbedPane.getSelectedComponent()).saveFile(true);
+                    } else if (e.getSource() == closeTabItem) {
+                        if (tabbedPane.getTabCount() <= 1) {
+                            return;
+                        }
+                        tabbedPane.remove(tabbedPane.getSelectedIndex());
+                        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+                        tabbedPane.getComponent(tabbedPane.getTabCount() - 1).requestFocus();
+                    } else if (e.getSource() == exitItem) {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == newItem) {
-                    EditorPane p = new EditorPane();
-                    tabbedPane.addTab("  ?  ", null, p, "???");
-                    tabbedPane.setSelectedComponent(p);
-                    p.requestFocus();
-                } else if (e.getSource() == openItem) {
-                    EditorPane p = new EditorPane();
-                    tabbedPane.addTab("  ?  ", null, p, "???");
-                    tabbedPane.setSelectedComponent(p);
-                    p.loadFile();
-                    p.requestFocus();
-                } else if (e.getSource() == saveItem) {
-                    getCurrEditorPane().saveFile(false);
-                } else if (e.getSource() == saveAsItem) {
-                    getCurrEditorPane().saveFile(true);
-                } else if (e.getSource() == closeTabItem) {
-                    if (tabbedPane.getTabCount() <= 1) {
-                        return;
+                        int dialogButton = JOptionPane.YES_NO_OPTION;
+                        int dialogResult = JOptionPane.showConfirmDialog(null, "Quit?", "Warning", dialogButton);
+                        if (dialogResult == JOptionPane.YES_OPTION) {
+                            System.exit(0);
+                        }
                     }
-                    tabbedPane.remove(tabbedPane.getSelectedIndex());
-                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-                    tabbedPane.getComponent(tabbedPane.getTabCount() - 1).requestFocus();
-                } else if (e.getSource() == exitItem) {
 
-                    int dialogButton = JOptionPane.YES_NO_OPTION;
-                    int dialogResult = JOptionPane.showConfirmDialog(null, "Quit?", "Warning", dialogButton);
-                    if (dialogResult == JOptionPane.YES_OPTION) {
-                        System.exit(0);
-                    }
+                    // XXX set window title
+                    selfFrame.setTitle(tabbedPane.getTitleAt(tabbedPane.getSelectedIndex()));
+
                 }
-            }
-        };
+            };
+        }
 
         newItem.addActionListener(actionListener);
         openItem.addActionListener(actionListener);
@@ -153,8 +157,8 @@ public class SupraEditor extends JFrame {
                         EditorPane editorPane = (EditorPane) tabs.getSelectedComponent();
                         editorPane.textArea.requestFocus();
 
-                        // TODO
-                        // selfFrame.setTitle(tabs.getTitleAt(tabs.getSelectedIndex()));
+                        // XXX set window title
+                        selfFrame.setTitle(tabs.getTitleAt(tabs.getSelectedIndex()));
                     }
                 }
 

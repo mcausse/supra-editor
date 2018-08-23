@@ -1,5 +1,6 @@
 package org.homs.supraedit;
 
+import java.awt.Color;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
@@ -12,6 +13,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.Highlight;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 import org.homs.supraedit.util.ExceptionUtils;
 
@@ -270,7 +275,101 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
             }
         }
 
+        autoHiglights(textArea);
+
         return false;
+
+    }
+
+    protected final HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
+
+    protected void autoHiglights(JTextArea textArea) {
+
+        Highlighter highlighter = textArea.getHighlighter();
+
+        // borra els higlights que hi puguin haver (la sel.lecció és un highlight i no
+        // convé borrar-la!)
+        for (Highlight h : highlighter.getHighlights()) {
+            if (h.getPainter() == painter) {
+                highlighter.removeHighlight(h);
+            }
+        }
+
+        if (textArea.getCaretPosition() <= 0) {
+            return;
+        }
+
+        try {
+            char antchar = textArea.getText(textArea.getCaretPosition() - 1, 1).charAt(0);
+
+            char target;
+            int dir;
+
+            switch (antchar) {
+            case '(':
+                target = ')';
+                dir = 1;
+                break;
+            case '[':
+                target = ']';
+                dir = 1;
+                break;
+            case '{':
+                target = '}';
+                dir = 1;
+                break;
+            case '<':
+                target = '>';
+                dir = 1;
+                break;
+
+            case ')':
+                target = '(';
+                dir = -1;
+                break;
+            case ']':
+                target = '[';
+                dir = -1;
+                break;
+            case '}':
+                target = '{';
+                dir = -1;
+                break;
+            case '>':
+                target = '<';
+                dir = -1;
+                break;
+
+            default:
+
+                return;
+            }
+
+            int targetPos = textArea.getCaretPosition() - 1;
+
+            int count = 0;
+
+            while (targetPos >= 0 && targetPos <= textArea.getDocument().getLength()) {
+
+                char c = textArea.getText(targetPos, 1).charAt(0);
+
+                if (c == target) {
+                    count--;
+                    if (count == 0) {
+                        highlighter.addHighlight(targetPos, targetPos + 1, painter);
+                        break;
+                    }
+                } else if (c == antchar) {
+                    count++;
+                }
+
+                targetPos += dir;
+            }
+
+        } catch (Exception e1) {
+            JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e1)));
+            e1.printStackTrace();
+        }
 
     }
 
@@ -380,33 +479,32 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
                 StringBuilder sb = new StringBuilder();
 
-                // Process p = Runtime.getRuntime().exec(command);
-                // p.waitFor();
-                //
-                // BufferedReader reader = new BufferedReader(new
-                // InputStreamReader(p.getInputStream()));
-                // String line = "";
-                // while ((line = reader.readLine()) != null) {
-                // sb.append(line + "\n");
-                // }
-                //
+                Process p = Runtime.getRuntime().exec(command);
+                p.waitFor();
 
-                // ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c",
-                // "cd \"C:\\Program Files\\Microsoft SQL Server\" && dir");
-                // ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
-                ProcessBuilder builder = new ProcessBuilder(command);
-                builder.redirectErrorStream(true);
-                Process p = builder.start();
-                BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                String line;
-                while (true) {
-                    line = r.readLine();
-                    if (line == null) {
-                        break;
-                    }
-                    // System.out.println(line);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                String line = "";
+                while ((line = reader.readLine()) != null) {
                     sb.append(line + "\n");
                 }
+
+                // // ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c",
+                // // "cd \"C:\\Program Files\\Microsoft SQL Server\" && dir");
+                // // ProcessBuilder builder = new ProcessBuilder("cmd.exe", "/c", command);
+                // ProcessBuilder builder = new ProcessBuilder(command);
+                // builder.redirectErrorStream(true);
+                // Process p = builder.start();
+                // BufferedReader r = new BufferedReader(new
+                // InputStreamReader(p.getInputStream()));
+                // String line;
+                // while (true) {
+                // line = r.readLine();
+                // if (line == null) {
+                // break;
+                // }
+                // // System.out.println(line);
+                // sb.append(line + "\n");
+                // }
 
                 textArea.insert(sb.toString(), textArea.getCaretPosition());
                 textArea.requestFocus();
