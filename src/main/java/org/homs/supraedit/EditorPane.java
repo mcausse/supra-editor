@@ -8,6 +8,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.nio.charset.Charset;
 
@@ -186,7 +188,7 @@ public class EditorPane extends JPanel {
         {
             final UndoManager undo = new UndoManager();
             undo.discardAllEdits();
-            undo.setLimit(200);
+            undo.setLimit(500);
 
             textArea.getDocument().addUndoableEditListener(new UndoableEditListener() {
                 @Override
@@ -272,8 +274,33 @@ public class EditorPane extends JPanel {
             scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() + 20);
         };
 
-        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new SupraKeyEventDispatcher(
-                macroRecording, cmdTextField, onTabToLeft, onTabToRight, onScrollUp, onScrollDown));
+        SupraKeyEventDispatcher supraKeyEventDispatcher = new SupraKeyEventDispatcher(macroRecording, cmdTextField,
+                onTabToLeft, onTabToRight, onScrollUp, onScrollDown);
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(supraKeyEventDispatcher);
+
+        textArea.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                supraKeyEventDispatcher.autoHiglights(textArea);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
 
         textArea.requestFocus();
     }

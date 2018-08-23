@@ -54,7 +54,7 @@ public class SupraEditor extends JFrame {
         super(".");
 
         {
-            java.net.URL imgURL = getClass().getClassLoader().getResource("e64.png");
+            java.net.URL imgURL = getClass().getClassLoader().getResource("void.png");
             ImageIcon icon = new ImageIcon(imgURL);
             setIconImage(icon.getImage());
         }

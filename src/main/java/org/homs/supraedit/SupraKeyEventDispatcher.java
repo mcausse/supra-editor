@@ -283,7 +283,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
     protected final HighlightPainter painter = new DefaultHighlighter.DefaultHighlightPainter(Color.pink);
 
-    protected void autoHiglights(JTextArea textArea) {
+    public void autoHiglights(JTextArea textArea) {
 
         Highlighter highlighter = textArea.getHighlighter();
 
