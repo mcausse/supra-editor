@@ -29,11 +29,12 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
     final Closure onTabToRight;
     final Closure onScrollUp;
     final Closure onScrollDown;
+    final Closure onCursorUpdate;
 
     final Stack<Integer> markerPositionsStack = new Stack<>();
 
     public SupraKeyEventDispatcher(MacroRecording macroRecording, JTextField cmdTextField, Closure onTabToLeft,
-            Closure onTabToRight, Closure onScrollUp, Closure onScrollDown) {
+            Closure onTabToRight, Closure onScrollUp, Closure onScrollDown, Closure onCursorUpdate) {
         super();
         this.macroRecording = macroRecording;
         this.cmdTextField = cmdTextField;
@@ -41,6 +42,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
         this.onTabToRight = onTabToRight;
         this.onScrollUp = onScrollUp;
         this.onScrollDown = onScrollDown;
+        this.onCursorUpdate = onCursorUpdate;
     }
 
     boolean controlPressed = false;
@@ -199,7 +201,6 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                                     ta.setCaretPosition(onShiftCaretPosition);
                                     ta.moveCaretPosition(realBegin);
                                 } else {
-                                    // TODO usar "moveCaretPosition" en f, F i @f
                                     ta.setCaretPosition(onShiftCaretPosition);
                                     ta.moveCaretPosition(charsBegin);
                                 }
@@ -276,6 +277,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
         }
 
         autoHiglights(textArea);
+        this.onCursorUpdate.execute();
 
         return false;
 
@@ -392,7 +394,8 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 } else {
                     // trobat
                     textArea.requestFocus();
-                    textArea.select(pos, pos + cmdVal.length());
+                    textArea.setCaretPosition(pos);
+                    textArea.moveCaretPosition(pos + cmdVal.length());
                 }
             }
 
@@ -400,7 +403,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
 
             String cmdVal = cmd.substring(1);
 
-            int findPos = textArea.getCaretPosition(); // - 1;
+            int findPos = textArea.getCaretPosition() - 1;
             if (findPos <= 0) {
                 textArea.requestFocus();
             } else {
@@ -412,7 +415,8 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                 } else {
                     // trobat
                     textArea.requestFocus();
-                    textArea.select(pos, pos + cmdVal.length());
+                    textArea.setCaretPosition(pos + cmdVal.length());
+                    textArea.moveCaretPosition(pos);
                 }
             }
 
@@ -432,8 +436,7 @@ public class SupraKeyEventDispatcher implements KeyEventDispatcher {
                     // trobat
                     textArea.requestFocus();
                     textArea.setCaretPosition(m.start());
-                    textArea.setSelectionStart(m.start());
-                    textArea.setSelectionEnd(m.end());
+                    textArea.moveCaretPosition(m.end());
                 } else {
                     // no troba més: deixa el cursor a final de fitxer
                     textArea.requestFocus();

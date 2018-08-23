@@ -18,6 +18,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -30,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.UndoableEditEvent;
 import javax.swing.event.UndoableEditListener;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -89,6 +91,10 @@ public class EditorPane extends JPanel {
         cmdTextField.setSelectedTextColor(Constants.selectionColor);
         cmdTextField.setSelectionColor(Constants.selectionBackgroundColor);
         menuBar.add(cmdTextField);
+
+        JLabel cursorPosLabel = new JLabel();
+        cursorPosLabel.setText(" ? ");
+        menuBar.add(cursorPosLabel);
 
         this.textArea = new JTextArea();
         MacroRecording macroRecording = new MacroRecording(textArea, cmdTextField);
@@ -273,9 +279,22 @@ public class EditorPane extends JPanel {
         Closure onScrollDown = () -> {
             scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getValue() + 20);
         };
+        Closure onCursorUpdate = () -> {
+            try {
+                int line = textArea.getLineOfOffset(textArea.getCaretPosition());
+                int lineStart = textArea.getLineStartOffset(line);
+                int column = textArea.getCaretPosition() - lineStart;
+
+                cursorPosLabel.setText(" " + (line + 1) + ":" + column + " ");
+
+            } catch (BadLocationException e1) {
+                JOptionPane.showMessageDialog(null, new JTextArea(ExceptionUtils.toString(e1)));
+                e1.printStackTrace();
+            }
+        };
 
         SupraKeyEventDispatcher supraKeyEventDispatcher = new SupraKeyEventDispatcher(macroRecording, cmdTextField,
-                onTabToLeft, onTabToRight, onScrollUp, onScrollDown);
+                onTabToLeft, onTabToRight, onScrollUp, onScrollDown, onCursorUpdate);
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(supraKeyEventDispatcher);
 
         textArea.addMouseListener(new MouseListener() {
@@ -283,6 +302,7 @@ public class EditorPane extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 supraKeyEventDispatcher.autoHiglights(textArea);
+                onCursorUpdate.execute();
             }
 
             @Override
